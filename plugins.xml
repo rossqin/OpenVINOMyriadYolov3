@@ -1,0 +1,6 @@
+<ie>
+    <plugins>
+        <plugin name="MYRIAD" location="myriadPlugin.dll">
+        </plugin>
+    </plugins>
+</ie>
