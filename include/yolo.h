@@ -31,5 +31,5 @@ void parse_output(const string& layer_name, const Blob::Ptr& blob, vector<Detect
 	const YoloDetectionConfig& yolo_config, const Size& img_sz, const Size& net_sz, float obj_threshold, float nms_threshold);
 
 void draw_detections(Mat& frame, vector<DetectionObject>& objects);
-void print_perf_counts(const map<string, InferenceEngineProfileInfo>& performanceMap, ostream& stream, bool header = true);
+void print_perf_counts(const map<string, InferenceEngineProfileInfo>& performanceMap, const string& filename);
 void parse_yolo_definitions(const string& layer_name, XMLElement* root);

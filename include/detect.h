@@ -1,4 +1,6 @@
 #pragma once 
+#include <vector>
+using namespace std;
 enum {
     INDEX_PROBILITY_X = 0,
     INDEX_PROBILITY_Y,  // 1
@@ -30,7 +32,8 @@ float BoxIoUEx(const Box& A, const Box& B);
 class DetectionObject {
 public :
     Box box;
-    int  class_id;
+    int class_id;
+    int track_id;
     float confidence;
 
     DetectionObject(const Box& b, int cid, float conf);
@@ -38,3 +41,21 @@ public :
     bool operator <(const DetectionObject& s2) const; 
     bool operator >(const DetectionObject& s2) const;
 };
+struct GTInfo {
+    int class_id;
+    int x;
+    int y;
+    int w;
+    int h;
+};
+struct PredictionInfo {
+    float confidence;
+    float best_iou;
+    int class_id; 
+    int gt_index;
+    bool primary; // primary prediction of one gt 
+};
+inline bool compare_confidence(const PredictionInfo& p1, const PredictionInfo& p2) {
+    return p1.confidence > p2.confidence;
+}
+void calc_accuracy(const vector<DetectionObject>& objects, const vector<GTInfo>& gts, vector<PredictionInfo>& predictions);

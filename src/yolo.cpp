@@ -15,12 +15,14 @@ void dump_data(const string& layer_name, const Blob::Ptr& blob) {
     float* output = blob->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
     string fname = layer_name + ".data.txt";
     ofstream ofile(fname);
-    ofile << fixed << std::setprecision(6);
+    ofile << "FP32 [" << dims[0] << ", " << dims[1] << ", " << dims[2] << ", " << dims[3] << "]\n";
+    ofile << "batch: 0\n";
+    ofile << fixed << std::setprecision(4);
     int index = 0;
     for (int c = 0; c < dims[1]; c++) {
         for (int h = 0; h < dims[2]; h++) {
             for (int w = 0; w < dims[3]; w++) {
-                ofile << setw(10) << output[index++] << ' ';
+                ofile <<  output[index++] << ' ';
             }
             ofile << endl;
         }
@@ -51,6 +53,7 @@ void parse_output(const string& layer_name, const Blob::Ptr& blob, vector<Detect
     float expand_h = (float)img_sz.height / (float)net_sz.height;
      
     float* output = blob->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
+
     int classes = yolo_config.classes.size();
     
     //TODO: 

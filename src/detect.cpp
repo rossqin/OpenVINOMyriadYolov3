@@ -87,3 +87,41 @@ bool DetectionObject::operator <(const DetectionObject& s2) const {
 bool DetectionObject::operator >(const DetectionObject& s2) const {
 	return this->confidence > s2.confidence;
 }
+
+void calc_accuracy(const vector<DetectionObject>& objects,const vector<GTInfo>& gts,vector<PredictionInfo>& predictions) {
+	PredictionInfo pdi;
+	unsigned int prev_predicts = predictions.size();
+	for (int d = 0; d < objects.size(); d++) {
+		auto& det = objects.at(d);
+		pdi.best_iou = 0.0f;
+		pdi.gt_index = -1;
+		pdi.class_id = -1;
+		for (int g = 0; g < gts.size(); g++) {
+			const GTInfo& gt = gts[g];
+			Box gt_box(gt.x, gt.y, gt.w, gt.h);
+			float iou = BoxIoU(gt_box, det.box);
+			if (iou > pdi.best_iou) {
+				pdi.best_iou = iou;
+				pdi.gt_index = g;
+			}
+		}
+		pdi.confidence = det.confidence;
+		pdi.class_id = det.class_id;
+		pdi.primary = (pdi.gt_index != -1 && det.class_id == gts[pdi.gt_index].class_id);
+		if (pdi.primary) {
+			for (unsigned int i = prev_predicts; i < predictions.size(); i++) {
+				PredictionInfo& prev_p = predictions[i];
+				if (prev_p.gt_index == pdi.gt_index) {
+					// for one gt, we treat the prediction with the best_iou as primary prediction
+					if (prev_p.best_iou >= pdi.best_iou) {
+						pdi.primary = false;
+					}
+					else {
+						prev_p.primary = false;
+					}
+				}
+			}
+		}
+		predictions.push_back(pdi);
+	}
+}
